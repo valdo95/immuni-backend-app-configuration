@@ -166,7 +166,9 @@ jobs:
                 --network container:docker_api_1 \
                 appropriate/curl \
                 --verbose \
-                --request GET \
+                --retry 10 \
+                --retry-delay 1 \
+                --retry-connrefused \
                 http://localhost:5000
       - run:
           name: "[docker] Stop the example"
