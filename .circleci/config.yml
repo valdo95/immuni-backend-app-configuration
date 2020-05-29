@@ -59,7 +59,6 @@ commands:
       - restore_cache:
           name: "[python] Restore the dependencies cache"
           keys:
-            - venv-<< parameters.deps_cache_version >>-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ checksum "./poetry.lock" }}-{{ git submodule status | awk '{print $1;}' }}
             - venv-<< parameters.deps_cache_version >>-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ checksum "./poetry.lock" }}
             - venv-<< parameters.deps_cache_version >>-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}
             - venv-<< parameters.deps_cache_version >>-{{ .Environment.CIRCLE_JOB }}
@@ -71,7 +70,7 @@ commands:
           command: poetry install -v << parameters.additional_parameters >>
       - save_cache:
           name: "[python] Save the dependencies cache"
-          key: venv-<< parameters.deps_cache_version >>-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ checksum "./poetry.lock" }}-{{ git submodule status | awk '{print $1;}' }}
+          key: venv-<< parameters.deps_cache_version >>-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ checksum "./poetry.lock" }}
           paths:
             - .venv
       - run:
@@ -122,7 +121,8 @@ jobs:
     steps:
       - checkout
       - initialize-submodules
-      - poetry-install
+      - poetry-install:
+          deps_cache_version: "v2"
       - pytest:
           coverage_path: ./immuni_app_configuration
 
@@ -133,7 +133,8 @@ jobs:
     steps:
       - checkout
       - initialize-submodules
-      - poetry-install
+      - poetry-install:
+          deps_cache_version: "v2"
       - run:
           name: "[python] Run checks"
           command: poetry run checks immuni_app_configuration --ci
